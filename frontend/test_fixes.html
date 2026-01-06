@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Fixes Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .test-button { padding: 10px 20px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        #api-test-result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Fixes Test</h1>
+    
+    <div class="test-section">
+        <h2>Function Safety Tests</h2>
+        <div id="function-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Connection Test</h2>
+        <button class="test-button" onclick="testAPI()">Test API Connection</button>
+        <div id="api-test-result"></div>
+    </div>
+    
+    <script>
+        // Copy the fixed functions from script.js
+        function formatAnalysisText(text) {
+            // Check if text is undefined or null
+            if (!text || typeof text !== 'string') {
+                return '<p>No analysis available</p>';
+            }
+            
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/^/, '<p>')
+                .replace(/$/, '</p>');
+        }
+
+        function escapeForAttribute(text) {
+            if (!text || typeof text !== 'string') {
+                return '';
+            }
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        }
+
+        function escapeHtml(text) {
+            if (!text || typeof text !== 'string') {
+                return '';
+            }
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatCodeResult(result) {
+            // Safety check for result object
+            if (!result || typeof result !== 'object') {
+                return '<div class="result-content"><p>No code result available</p></div>';
+            }
+            
+            const code = result.code || '';
+            const language = result.language || 'text';
+            const framework = result.framework || '';
+            
+            return `Code: ${escapeHtml(code)}, Language: ${language}, Framework: ${framework}`;
+        }
+
+        function formatAnalysisResult(result) {
+            // Safety check for result object
+            if (!result || typeof result !== 'object') {
+                return '<div class="result-content"><p>No analysis result available</p></div>';
+            }
+            
+            const review = result.review || '';
+            return `Analysis: ${formatAnalysisText(review)}`;
+        }
+
+        // Test the functions
+        function runFunctionTests() {
+            const results = [];
+            
+            // Test formatAnalysisText with undefined
+            try {
+                const result1 = formatAnalysisText(undefined);
+                results.push(`<span class="success">✅ formatAnalysisText(undefined): ${result1}</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ formatAnalysisText(undefined): ${e.message}</span>`);
+            }
+            
+            // Test formatAnalysisText with null
+            try {
+                const result2 = formatAnalysisText(null);
+                results.push(`<span class="success">✅ formatAnalysisText(null): ${result2}</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ formatAnalysisText(null): ${e.message}</span>`);
+            }
+            
+            // Test formatAnalysisText with valid text
+            try {
+                const result3 = formatAnalysisText("**Bold text**\\n\\nNew paragraph");
+                results.push(`<span class="success">✅ formatAnalysisText(valid): ${result3}</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ formatAnalysisText(valid): ${e.message}</span>`);
+            }
+            
+            // Test escapeForAttribute with undefined
+            try {
+                const result4 = escapeForAttribute(undefined);
+                results.push(`<span class="success">✅ escapeForAttribute(undefined): "${result4}"</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ escapeForAttribute(undefined): ${e.message}</span>`);
+            }
+            
+            // Test escapeHtml with undefined
+            try {
+                const result5 = escapeHtml(undefined);
+                results.push(`<span class="success">✅ escapeHtml(undefined): "${result5}"</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ escapeHtml(undefined): ${e.message}</span>`);
+            }
+            
+            // Test formatCodeResult with undefined
+            try {
+                const result6 = formatCodeResult(undefined);
+                results.push(`<span class="success">✅ formatCodeResult(undefined): ${result6}</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ formatCodeResult(undefined): ${e.message}</span>`);
+            }
+            
+            // Test formatAnalysisResult with undefined
+            try {
+                const result7 = formatAnalysisResult(undefined);
+                results.push(`<span class="success">✅ formatAnalysisResult(undefined): ${result7}</span>`);
+            } catch (e) {
+                results.push(`<span class="error">❌ formatAnalysisResult(undefined): ${e.message}</span>`);
+            }
+            
+            return results;
+        }
+        
+        // Test API connection
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-test-result');
+            resultDiv.innerHTML = 'Testing API connection...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: 'Create a simple hello world function',
+                        language: 'python'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<span class="success">✅ API Connection Successful!</span><br>Response: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ API Error: ${result.error || 'Unknown error'}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Network Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Run tests and display results
+        document.addEventListener('DOMContentLoaded', function() {
+            const testResults = runFunctionTests();
+            const resultsDiv = document.getElementById('function-test-results');
+            resultsDiv.innerHTML = '<h3>Function Test Results:</h3><ul>' + 
+                testResults.map(result => `<li>${result}</li>`).join('') + 
+                '</ul>';
+        });
+    </script>
+</body>
+</html>

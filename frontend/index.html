@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Assistant - Working Features</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Simplified Icons */
+        .icon { font-size: 1.2em; margin-right: 8px; }
+        .code-icon::before { content: "💻"; }
+        .analyze-icon::before { content: "🔍"; }
+        .robot-icon::before { content: "🤖"; }
+        .copy-icon::before { content: "📋"; }
+        .download-icon::before { content: "⬇️"; }
+        .clear-icon::before { content: "🗑️"; }
+        .magic-icon::before { content: "✨"; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="icon robot-icon"></span>
+                    <h1>AI Code Assistant</h1>
+                    <span class="status-badge">Working Features Only</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Feature Toggle -->
+            <div class="feature-toggle">
+                <button class="toggle-btn active" data-feature="generator">
+                    <span class="icon code-icon"></span>
+                    Code Generator
+                </button>
+                <button class="toggle-btn" data-feature="analyzer">
+                    <span class="icon analyze-icon"></span>
+                    Code Analyzer
+                </button>
+            </div>
+
+            <!-- Code Generator Section -->
+            <section id="generator-section" class="feature-section active">
+                <div class="section-header">
+                    <h2><span class="icon code-icon"></span>AI Code Generator</h2>
+                    <p>Generate clean, production-ready code with AI assistance</p>
+                </div>
+                
+                <div class="input-panel">
+                    <div class="form-group">
+                        <label for="code-prompt">What do you want to build?</label>
+                        <textarea 
+                            id="code-prompt" 
+                            placeholder="Describe what you want to create... (e.g., 'Create a Python function to calculate fibonacci numbers')"
+                            rows="4"
+                        ></textarea>
+                        <div class="char-counter">
+                            <span id="code-prompt-counter">0</span>/2000
+                        </div>
+                    </div>
+                    
+                    <div class="options-row">
+                        <div class="form-group">
+                            <label for="language">Language</label>
+                            <select id="language">
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="typescript">TypeScript</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="go">Go</option>
+                                <option value="rust">Rust</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="framework">Framework (Optional)</label>
+                            <select id="framework">
+                                <option value="none">None</option>
+                                <option value="react">React</option>
+                                <option value="vue">Vue.js</option>
+                                <option value="angular">Angular</option>
+                                <option value="flask">Flask</option>
+                                <option value="django">Django</option>
+                                <option value="express">Express.js</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="include-comments" checked>
+                            <span class="checkmark"></span>
+                            Include detailed comments
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="include-types">
+                            <span class="checkmark"></span>
+                            Include type hints/annotations
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="include-tests">
+                            <span class="checkmark"></span>
+                            Include basic tests
+                        </label>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="generateCode()">
+                            <span class="icon magic-icon"></span>
+                            Generate Code
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearGeneratorForm()">
+                            <span class="icon clear-icon"></span>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result-panel">
+                    <div id="code-result" class="result-container">
+                        <div class="result-placeholder">
+                            <div class="placeholder-icon">
+                                <span class="icon code-icon"></span>
+                            </div>
+                            <h3>Ready to Generate</h3>
+                            <p>Enter your prompt and click generate to create code using AI</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Analyzer Section -->
+            <section id="analyzer-section" class="feature-section">
+                <div class="section-header">
+                    <h2><span class="icon analyze-icon"></span>AI Code Analyzer</h2>
+                    <p>Analyze and review your code for quality and best practices</p>
+                </div>
+                
+                <div class="input-panel">
+                    <div class="form-group">
+                        <label for="analyze-code">Paste your code here</label>
+                        <textarea 
+                            id="analyze-code" 
+                            placeholder="Paste the code you want to analyze..."
+                            rows="8"
+                        ></textarea>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="analyzeCode()">
+                            <span class="icon analyze-icon"></span>
+                            Analyze Code
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearAnalyzerForm()">
+                            <span class="icon clear-icon"></span>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result-panel">
+                    <div id="analyze-result" class="result-container">
+                        <div class="result-placeholder">
+                            <div class="placeholder-icon">
+                                <span class="icon analyze-icon"></span>
+                            </div>
+                            <h3>Ready to Analyze</h3>
+                            <p>Paste your code to get detailed analysis and suggestions</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p id="loading-message">Processing your request...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                    <i class="fas fa-code"></i>
+                    <span>Code Generation</span>
+                </button>
+                <button class="nav-item" data-agent="analyzer">
+                    <i class="fas fa-search"></i>
+                    <span>Code Analysis</span>
+                </button>
+                <button class="nav-item" data-agent="debugger">
+                    <i class="fas fa-bug"></i>
+                    <span>Debug Assistant</span>
+                </button>
+                <button class="nav-item" data-agent="optimizer">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Optimizer</span>
+                </button>
+                <button class="nav-item" data-agent="reviewer">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Code Review</span>
+                </button>
+                <button class="nav-item" data-agent="documenter">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Documentation</span>
+                </button>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="nav-item" id="settings-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="nav-item" id="help-btn">
+                    <i class="fas fa-book"></i>
+                    <span>Help & Docs</span>
+                </button>
+                <div class="status-indicator">
+                    <div class="status-dot online"></div>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Code Generation</h1>
+                    <p id="page-subtitle">Generate clean, production-ready code with AI assistance</p>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" id="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="header-btn" id="notifications-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">2</span>
+                    </button>
+                    <button class="header-btn" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="header-btn" id="profile-btn">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Code Generation Panel -->
+                <div id="coder" class="agent-panel active">
+                    <div class="panel-layout">
+                        <!-- Left Input Panel -->
+                        <div class="input-panel">
+                            <div class="panel-header">
+                                <div class="panel-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="panel-title">
+                                    <h3>Code Input</h3>
+                                    <p>Describe what you want to build</p>
+                                </div>
+                            </div>
+                            
+                            <div class="input-section">
+                                <div class="input-group">
+                                    <label class="input-label">
+                                        <i class="fas fa-magic"></i>
+                                        Prompt
+                                    </label>
+                                    <textarea 
+                                        id="code-prompt" 
+                                        class="input-textarea"
+                                        placeholder="Describe the code you want to generate..."
+                                        rows="6"
+                                    ></textarea>
+                                    <div class="char-counter">
+                                        <span id="code-prompt-counter">0</span> / 2000 characters
+                                    </div>
+                                </div>
+                                
+                                <div class="input-row">
+                                    <div class="input-group">
+                                        <label class="input-label">Language</label>
+                                        <select id="language" class="input-select">
+                                            <option value="typescript">TypeScript</option>
+                                            <option value="python">Python</option>
+                                            <option value="javascript">JavaScript</option>
+                                            <option value="java">Java</option>
+                                            <option value="cpp">C++</option>
+                                            <option value="go">Go</option>
+                                            <option value="rust">Rust</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Framework</label>
+                                        <select id="framework" class="input-select">
+                                            <option value="react">React</option>
+                                            <option value="vue">Vue.js</option>
+                                            <option value="angular">Angular</option>
+                                            <option value="express">Express</option>
+                                            <option value="fastapi">FastAPI</option>
+                                            <option value="spring">Spring Boot</option>
+                                            <option value="none">None</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="options-section">
+                                    <h4>Options</h4>
+                                    <div class="checkbox-group">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" id="include-types" checked>
+                                            <span class="checkmark"></span>
+                                            Include type definitions
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" id="include-comments" checked>
+                                            <span class="checkmark"></span>
+                                            Add comments & documentation
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" id="include-tests">
+                                            <span class="checkmark"></span>
+                                            Generate unit tests
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    <button class="btn-primary" onclick="generateCode()">
+                                        <i class="fas fa-magic"></i>
+                                        Generate Code
+                                    </button>
+                                    <button class="btn-secondary" onclick="clearCodeForm()">
+                                        <i class="fas fa-refresh"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Output Panel -->
+                        <div class="output-panel">
+                            <div id="code-result" class="result-container">
+                                <div class="result-placeholder">
+                                    <div class="placeholder-icon">
+                                        <i class="fas fa-code"></i>
+                                    </div>
+                                    <h3>Ready to Generate</h3>
+                                    <p>Enter your prompt and click generate to create code using AI</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Agent Panels (Hidden by default) -->
+                <div id="analyzer" class="agent-panel">
+                    <div class="panel-layout">
+                        <div class="input-panel">
+                            <div class="panel-header">
+                                <div class="panel-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="panel-title">
+                                    <h3>Code Analysis</h3>
+                                    <p>Analyze and review your code</p>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <div class="input-group">
+                                    <label class="input-label">Code to Analyze</label>
+                                    <textarea 
+                                        id="analyze-code" 
+                                        class="input-textarea"
+                                        placeholder="Paste your code here for analysis..."
+                                        rows="8"
+                                    ></textarea>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="btn-primary" onclick="analyzeCode()">
+                                        <i class="fas fa-search"></i>
+                                        Analyze Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="output-panel">
+                            <div id="analyze-result" class="result-container">
+                                <div class="result-placeholder">
+                                    <div class="placeholder-icon">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <h3>Ready to Analyze</h3>
+                                    <p>Paste your code to get detailed analysis and suggestions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add other panels similarly... -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>AI is working on your request...</h3>
+            <p id="loading-message">Analyzing your requirements</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+            <main class="content-area">
+                <!-- Code Generator Panel -->
+                <div id="coder" class="agent-panel active">
+                    <div class="panel-content">
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label for="code-prompt">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Describe what you want to build
+                                </label>
+                                <textarea id="code-prompt" 
+                                    placeholder="e.g., Create a Python function to calculate fibonacci numbers with memoization"
+                                    rows="4"></textarea>
+                                <div class="char-counter">
+                                    <span id="code-prompt-counter">0</span>/500 characters
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="language">
+                                        <i class="fas fa-code"></i>
+                                        Programming Language
+                                    </label>
+                                    <select id="language">
+                                        <option value="python">🐍 Python</option>
+                                        <option value="javascript">🟨 JavaScript</option>
+                                        <option value="java">☕ Java</option>
+                                        <option value="cpp">⚡ C++</option>
+                                        <option value="go">🔵 Go</option>
+                                        <option value="rust">🦀 Rust</option>
+                                        <option value="php">🐘 PHP</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="framework">
+                                        <i class="fas fa-layer-group"></i>
+                                        Framework (optional)
+                                    </label>
+                                    <input type="text" id="framework" 
+                                        placeholder="e.g., Flask, React, Spring Boot">
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button onclick="generateCode()" class="btn-primary">
+                                    <i class="fas fa-magic"></i>
+                                    Generate Code
+                                </button>
+                                <button onclick="clearCodeForm()" class="btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="code-result" class="result-panel">
+                            <div class="result-placeholder">
+                                <i class="fas fa-code"></i>
+                                <h3>Ready to Generate Code</h3>
+                                <p>Describe your requirements and I'll create clean, documented code for you.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debugger Panel -->
+                <div id="debugger" class="agent-panel">
+                    <div class="panel-content">
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label for="debug-code">
+                                    <i class="fas fa-bug"></i>
+                                    Code to Debug
+                                </label>
+                                <textarea id="debug-code" 
+                                    placeholder="Paste your problematic code here..."
+                                    rows="6"></textarea>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="error-message">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Error Message (optional)
+                                </label>
+                                <textarea id="error-message" 
+                                    placeholder="Paste the error message or describe the issue you're experiencing"
+                                    rows="3"></textarea>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button onclick="debugCode()" class="btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Debug Code
+                                </button>
+                                <button onclick="clearDebugForm()" class="btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="debug-result" class="result-panel">
+                            <div class="result-placeholder">
+                                <i class="fas fa-bug"></i>
+                                <h3>Ready to Debug</h3>
+                                <p>Paste your code and I'll help identify and fix any issues.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Planner Panel -->
+                <div id="planner" class="agent-panel">
+                    <div class="panel-content">
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label for="project-description">
+                                    <i class="fas fa-project-diagram"></i>
+                                    Project Description
+                                </label>
+                                <textarea id="project-description" 
+                                    placeholder="Describe your project idea, goals, requirements, and any specific technologies you want to use..."
+                                    rows="6"></textarea>
+                                <div class="char-counter">
+                                    <span id="project-description-counter">0</span>/1000 characters
+                                </div>
+                            </div>
+                            
+                            <div class="planning-options">
+                                <div class="option-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="include-timeline">
+                                        <span class="checkmark"></span>
+                                        Include development timeline
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="include-architecture">
+                                        <span class="checkmark"></span>
+                                        Include system architecture
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="include-tech-stack">
+                                        <span class="checkmark"></span>
+                                        Recommend technology stack
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button onclick="planProject()" class="btn-primary">
+                                    <i class="fas fa-rocket"></i>
+                                    Create Plan
+                                </button>
+                                <button onclick="clearPlanForm()" class="btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="plan-result" class="result-panel">
+                            <div class="result-placeholder">
+                                <i class="fas fa-project-diagram"></i>
+                                <h3>Ready to Plan</h3>
+                                <p>Describe your project and I'll create a comprehensive development plan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Generator Panel -->
+                <div id="tester" class="agent-panel">
+                    <div class="panel-content">
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label for="test-code">
+                                    <i class="fas fa-vial"></i>
+                                    Code to Test
+                                </label>
+                                <textarea id="test-code" 
+                                    placeholder="Paste the code you want to generate tests for..."
+                                    rows="6"></textarea>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="test-framework">
+                                        <i class="fas fa-flask"></i>
+                                        Test Framework
+                                    </label>
+                                    <select id="test-framework">
+                                        <option value="pytest">🐍 pytest (Python)</option>
+                                        <option value="jest">🟨 Jest (JavaScript)</option>
+                                        <option value="junit">☕ JUnit (Java)</option>
+                                        <option value="gtest">⚡ Google Test (C++)</option>
+                                        <option value="go-test">🔵 Go Test</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="test-coverage">
+                                        <i class="fas fa-percentage"></i>
+                                        Coverage Level
+                                    </label>
+                                    <select id="test-coverage">
+                                        <option value="basic">Basic Tests</option>
+                                        <option value="comprehensive">Comprehensive</option>
+                                        <option value="edge-cases">Include Edge Cases</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button onclick="generateTests()" class="btn-primary">
+                                    <i class="fas fa-flask"></i>
+                                    Generate Tests
+                                </button>
+                                <button onclick="clearTestForm()" class="btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="test-result" class="result-panel">
+                            <div class="result-placeholder">
+                                <i class="fas fa-vial"></i>
+                                <h3>Ready to Test</h3>
+                                <p>Provide your code and I'll generate comprehensive test suites.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>AI is working on your request...</h3>
+            <p id="loading-message">Analyzing your requirements</p>
+            <div class="loading-progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
