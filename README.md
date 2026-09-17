@@ -1,29 +1,46 @@
+<div align="center">
+
+<img src="docs/screenshots/logo.png" width="88" alt="Aizen logo">
+
 # Aizen
 
-**Type a prompt. Get a working project.**
+### Type a prompt. Get a working project.
 
-Aizen is a browser-based AI coding assistant. Describe what you want to build, and it classifies your intent, scaffolds a real project across ~10 tech stacks, and then keeps iterating on it — reading files, editing them, and validating the result — until it's actually done, not just generated once and abandoned.
+Aizen is a browser-based AI coding assistant. Describe what you want to build, and it classifies your intent, scaffolds a real project across ~10 tech stacks, and then keeps iterating — reading files, editing them, validating the result — until it's actually done, not just generated once and abandoned.
 
-<p align="center">
-  <img src="docs/screenshots/landing.png" width="850" alt="Aizen landing page">
-</p>
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](backend/requirements.txt)
+[![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](backend/app.py)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](aizen/frontend/package.json)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](aizen/frontend/package.json)
+[![Groq](https://img.shields.io/badge/LLM-Groq-F55036)](https://groq.com)
+[![License: MIT](https://img.shields.io/badge/license-MIT-informational)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/ShubhamPaithane04/Agentic-AI?style=flat&color=purple)](../../stargazers)
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Groq](https://img.shields.io/badge/LLM-Groq-F55036)
-![License](https://img.shields.io/badge/license-MIT-informational)
+<img src="docs/screenshots/landing.png" width="850" alt="Aizen landing page">
+
+**[Features](#features) · [Architecture](#architecture) · [Quickstart](#getting-started) · [API](#api-reference) · [Roadmap](#roadmap)**
+
+</div>
 
 ---
 
+> **If Aizen is useful to you, a ⭐ on the repo goes a long way — it's the easiest way to support it.**
+
 ## What makes it different
 
-Most "AI project generator" demos do one thing: call an LLM once, dump some files, done. Aizen is built around two ideas that go further:
+Most "AI project generator" demos do one thing: call an LLM once, dump some files, done. Aizen is built around ideas that go further:
 
-- **Intent-first, not generation-first.** Every request first goes through an intent classifier that decides whether you're asking a question, asking to build something new, or asking to modify what's already in the workspace — so a follow-up like "add a dark mode toggle" edits your existing project instead of regenerating it from scratch.
-- **An agent loop, not a single shot.** Build/modify requests hand off to an agent that lists files, reads one, edits one, runs a validation command, and repeats — for a bounded number of steps — until the result passes, rather than trusting the first draft.
-- **It never returns nothing.** If the Groq call fails or times out, a deterministic local fallback still produces a working template, so a flaky API call never leaves you with an empty workspace.
+|  | Typical one-shot generator | Aizen |
+|---|---|---|
+| **Understanding your ask** | Treats every message as "generate" | Classifies intent first — chat, new build, or edit |
+| **Follow-ups** | Regenerates the whole project from scratch | Edits the existing workspace in place |
+| **Generation** | Single LLM call, hope for the best | Agent loop: list → read → edit → **validate**, on a budget of steps |
+| **API failure** | Empty response, dead end | Deterministic local fallback — you always get *something* working |
+| **Visibility** | Black box until the zip drops | Every generated file is browsable mid-session |
+
+- 🧠 **Intent-first, not generation-first** — a follow-up like "add a dark mode toggle" edits your existing project instead of regenerating it from scratch
+- 🔁 **An agent loop, not a single shot** — bounded read/edit/validate cycles instead of trusting the first draft
+- 🛟 **It never returns nothing** — if the Groq call fails, a deterministic local fallback still produces a working template
 
 ## Features
 
@@ -149,6 +166,25 @@ sh start.sh   # macOS/Linux
 | `GET` | `/api/stats` / `/api/analytics` | Workspace metrics |
 | `POST` | `/api/github-push` | Push the generated workspace to GitHub |
 
+## Roadmap
+
+- [ ] Django, Vue, and Next.js project templates
+- [ ] Live iframe preview for generated web projects
+- [ ] One-click deploy (Vercel / Render) alongside GitHub push
+- [ ] Real-time multi-user collaboration on a workspace
+- [ ] Dockerized code execution sandbox
+
+## Contributing
+
+Issues and PRs are welcome. If you're proposing a larger change (a new stack template, a change to the agent loop), open an issue first so we can talk shape before code.
+
+```bash
+git checkout -b feature/your-idea
+# make your changes
+git commit -m "Add your idea"
+git push origin feature/your-idea
+```
+
 ## Security notes
 
 - Code execution runs in an isolated subprocess with a 10-second timeout
@@ -180,4 +216,12 @@ Make sure you're running with the project virtual environment's interpreter, not
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
+
+<div align="center">
+
+Built by [Shubham Paithane](https://github.com/ShubhamPaithane04)
+
+If this saved you time, [★ star the repo](../../stargazers) — it helps others find it.
+
+</div>
