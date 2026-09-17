@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aizen — AI Coding Workspace | Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: #1e1e2e;
+      --accent: #3b82f6;
+      --accent2: #8b5cf6;
+      --accent3: #10b981;
+      --accent4: #f59e0b;
+      --text: #f0f0f8;
+      --muted: #6b6b88;
+      --sans: 'Inter', sans-serif;
+      --mono: 'IBM Plex Mono', monospace;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── DECK ── */
+    .deck {
+      width: 100vw; height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── SLIDE ── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(60px);
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    /* ── GLOBAL AMBIENT BG ── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(59,130,246,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139,92,246,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── SLIDE GRID UTILITY ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; width: 100%; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.8rem; width: 100%; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.4rem; width: 100%; }
+
+    /* ── SLIDE HEADER ── */
+    .slide-header { text-align: center; margin-bottom: 3rem; }
+    .slide-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.28rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(59,130,246,0.25);
+      margin-bottom: 1rem;
+    }
+    .slide-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #f0f0f8 0%, #9090b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .slide-sub {
+      margin-top: 0.7rem;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.6rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); }
+    .card-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .card-body { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── ACCENT GLOW CARD ── */
+    .card.glow-blue  { box-shadow: 0 0 40px rgba(59,130,246,0.07);  }
+    .card.glow-purple{ box-shadow: 0 0 40px rgba(139,92,246,0.07); }
+    .card.glow-green { box-shadow: 0 0 40px rgba(16,185,129,0.07); }
+    .card.glow-amber { box-shadow: 0 0 40px rgba(245,158,11,0.07); }
+
+    /* ── PILL BADGE ── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .pill.blue   { background: rgba(59,130,246,0.1);   color: #93c5fd; border-color: rgba(59,130,246,0.2); }
+    .pill.purple { background: rgba(139,92,246,0.1);  color: #c4b5fd; border-color: rgba(139,92,246,0.2); }
+    .pill.green  { background: rgba(16,185,129,0.1);  color: #6ee7b7; border-color: rgba(16,185,129,0.2); }
+    .pill.amber  { background: rgba(245,158,11,0.1);  color: #fde68a; border-color: rgba(245,158,11,0.2); }
+    .pill.rose   { background: rgba(239,68,68,0.1);   color: #fca5a5; border-color: rgba(239,68,68,0.2); }
+
+    /* ── STAT BOX ── */
+    .stat-box { text-align: center; }
+    .stat-num {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; font-weight: 500; }
+
+    /* ── CODE SNIPPET ── */
+    .code-snippet {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      line-height: 1.7;
+      color: #a8b4c8;
+    }
+    .code-snippet .kw  { color: #c084fc; }
+    .code-snippet .str { color: #86efac; }
+    .code-snippet .cmt { color: #4b5563; }
+    .code-snippet .fn  { color: #60a5fa; }
+    .code-snippet .num { color: #fb923c; }
+
+    /* ── FLOW ARROW ── */
+    .flow {
+      display: flex; align-items: center; gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+
+    /* ── TIMELINE ── */
+    .timeline { display: flex; flex-direction: column; gap: 1.1rem; width: 100%; }
+    .tl-row {
+      display: flex; align-items: flex-start; gap: 1.2rem;
+    }
+    .tl-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .tl-content { flex: 1; }
+    .tl-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .tl-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── PROGRESS BAR ── */
+    .prog-row { margin-bottom: 0.9rem; }
+    .prog-label { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.35rem; }
+    .prog-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 99px; transition: width 1s ease; }
+
+    /* ── NAVIGATION ── */
+    nav.controls {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 1rem;
+      background: rgba(10,10,20,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      z-index: 100;
+    }
+    nav .nav-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); padding: 0.3rem 0.5rem;
+      font-size: 1.1rem; border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    nav .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .slide-counter { font-size: 0.72rem; color: var(--muted); font-family: var(--mono); min-width: 40px; text-align: center; }
+    .progress-dots { display: flex; gap: 5px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.3s, transform 0.3s; cursor: pointer; }
+    .dot.active { background: var(--accent); transform: scale(1.4); }
+
+    /* ── SLIDE 1 — HERO ── */
+    #s1 { text-align: center; }
+    .hero-logo {
+      width: 90px; height: 90px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 900; color: white;
+      margin: 0 auto 2rem;
+      box-shadow: 0 20px 60px rgba(59,130,246,0.3);
+      position: relative;
+    }
+    .hero-logo::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 29px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      pointer-events: none;
+    }
+    .hero-title {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #ffffff 0%, #9090c0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.05;
+    }
+    .hero-tagline {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: var(--muted);
+      margin-top: 1.2rem;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-pills { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+    .hero-name {
+      margin-top: 3rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── DIVIDER LINE ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 2rem 0;
+    }
+
+    /* ── ARCH DIAGRAM ── */
+    .arch-layer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+    }
+    .arch-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      min-width: 80px;
+    }
+    .arch-items { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* keyboard hint */
+    .kbd-hint {
+      position: fixed;
+      top: 1.5rem; right: 2rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .kbd { display: inline-block; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.65rem; margin: 0 2px; }
+
+    /* wide card left/right */
+    .feature-row {
+      display: flex; gap: 1.5rem; align-items: stretch; width: 100%;
+    }
+    .feature-main {
+      flex: 2;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.8rem;
+    }
+    .feature-aside {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .mini-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      flex: 1;
+    }
+    .mini-card-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.4rem; }
+    .mini-card-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+
+    /* roadmap */
+    .roadmap-col { display: flex; flex-direction: column; gap: 0.85rem; }
+    .rm-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+    }
+    .rm-icon { font-size: 1.15rem; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .rm-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .rm-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.45; }
+
+    /* final cta */
+    .cta-card {
+      background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.08));
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 24px;
+      padding: 3rem;
+      text-align: center;
+      width: 100%;
+      max-width: 700px;
+    }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      margin-top: 1.5rem;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem 1.8rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: var(--sans);
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(59,130,246,0.35); }
+  </style>
+</head>
+<body>
+
+<div class="kbd-hint">
+  <span class="kbd">←</span><span class="kbd">→</span> or click arrows to navigate
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 1 — HERO
+  ════════════════════════════════════════════ -->
+  <div class="slide active" id="s1">
+    <div class="hero-logo">AI</div>
+    <div class="hero-title">Aizen</div>
+    <div class="hero-tagline">
+      A full-stack AI coding workspace that turns a single prompt into a complete,
+      runnable project — with live preview, file editing, and one-click GitHub push.
+    </div>
+    <div class="hero-pills">
+      <span class="pill blue">🐍 Flask Backend</span>
+      <span class="pill purple">⚛️ React + Vite Frontend</span>
+      <span class="pill green">🤖 Groq LLM</span>
+      <span class="pill amber">🔐 JWT Auth</span>
+      <span class="pill rose">📦 SQLite</span>
+    </div>
+    <div class="hero-name">Major Project Presentation — 2025–26</div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 2 — PROBLEM
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="slide-header">
+      <div class="slide-tag">The Problem</div>
+      <div class="slide-title">Why does coding feel so slow?</div>
+      <div class="slide-sub">Developers spend hours on boilerplate before writing a single line of real logic.</div>
+    </div>
+    <div class="grid-3">
+      <div class="card glow-blue">
+        <div class="card-icon" style="background:rgba(239,68,68,0.1); color:#f87171;">⏱️</div>
+        <div class="card-title">Hours of Setup</div>
+        <div class="card-body">Every new project starts with folder creation, configs, package installs, and boilerplate — before any real work begins.</div>
+      </div>
+      <div class="card glow-purple">
+        <div class="card-icon" style="background:rgba(245,158,11,0.1); color:#fbbf24;">🔄</div>
+        <div class="card-title">Context Switching</div>
+        <div class="card-body">Jumping between docs, Stack Overflow, GitHub, and IDEs breaks focus and slows down the development cycle dramatically.</div>
+      </div>
+      <div class="card glow-green">
+        <div class="card-icon" style="background:rgba(139,92,246,0.1); color:#a78bfa;">🧩</div>
+        <div class="card-title">No Unified Workspace</div>
+        <div class="card-body">Chat, generate, edit, preview, push — these are all separate tools with no cohesion. Developers need to move between 5+ apps.</div>
+      </div>
+    </div>
+    <div style="margin-top:2.5rem; text-align:center;">
+      <div class="pill blue" style="font-size:0.85rem; padding: 0.5rem 1.5rem;">
+        💡 Aizen solves all three in one unified interface
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 3 — WHAT IS AIZEN
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="slide-header">
+      <div class="slide-tag">Solution</div>
+      <div class="slide-title">What Aizen Does</div>
+      <div class="slide-sub">One natural language prompt. A complete, working project in seconds.</div>
+    </div>
+    <div style="width:100%;">
+      <div class="flow" style="justify-content:center; margin-bottom:2.5rem;">
+        <div class="flow-step"><span>💬</span> User Prompt</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>🧠</span> AI Intent Detection</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>🏗️</span> Project Scaffolding</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>✅</span> Live Workspace</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>🚀</span> GitHub Push</div>
+      </div>
+      <div class="grid-2">
+        <div class="card glow-blue">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:0.8rem;">Example Prompt</div>
+          <div class="code-snippet">
+            <span class="str">"Build a full-stack SaaS dashboard<br>
+            with JWT auth, user analytics,<br>
+            and a REST API in Flask + React"</span>
+          </div>
+        </div>
+        <div class="card glow-green">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:0.8rem;">Aizen Generates</div>
+          <div class="timeline">
+            <div class="tl-row">
+              <div class="tl-dot" style="background:#3b82f6;"></div>
+              <div class="tl-content">
+                <div class="tl-title">Flask backend</div>
+                <div class="tl-desc">app.py, models, JWT middleware, 10+ endpoints</div>
+              </div>
+            </div>
+            <div class="tl-row">
+              <div class="tl-dot" style="background:#8b5cf6;"></div>
+              <div class="tl-content">
+                <div class="tl-title">React frontend</div>
+                <div class="tl-desc">Components, routing, state management, CSS</div>
+              </div>
+            </div>
+            <div class="tl-row">
+              <div class="tl-dot" style="background:#10b981;"></div>
+              <div class="tl-content">
+                <div class="tl-title">Config & docs</div>
+                <div class="tl-desc">package.json, requirements.txt, README.md</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 4 — ARCHITECTURE
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="slide-header">
+      <div class="slide-tag">Architecture</div>
+      <div class="slide-title">Technical Stack</div>
+      <div class="slide-sub">A clean separation of concerns between AI engine, API, and UI layers.</div>
+    </div>
+    <div class="grid-2" style="gap:1.5rem;">
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="arch-layer">
+          <div class="arch-label" style="color:#f472b6;">🌐 Frontend</div>
+          <div class="arch-items">
+            <span class="pill purple">React 18</span>
+            <span class="pill purple">Vite</span>
+            <span class="pill purple">Zustand</span>
+            <span class="pill purple">Tailwind CSS</span>
+            <span class="pill purple">ReactMarkdown</span>
+          </div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↕ SSE Streaming</div>
+        <div class="arch-layer">
+          <div class="arch-label" style="color:#60a5fa;">⚙️ Backend</div>
+          <div class="arch-items">
+            <span class="pill blue">Flask</span>
+            <span class="pill blue">Python 3.10</span>
+            <span class="pill blue">JWT Auth</span>
+            <span class="pill blue">SQLite</span>
+          </div>
+        </div>
+        <div style="text-align:center;color:var(--muted);font-size:1.2rem;">↕ Groq API</div>
+        <div class="arch-layer">
+          <div class="arch-label" style="color:#6ee7b7;">🤖 AI Layer</div>
+          <div class="arch-items">
+            <span class="pill green">Llama 3.3 70B</span>
+            <span class="pill green">AgentRuntime</span>
+            <span class="pill green">ProjectBuilder</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;">Key Backend Services</div>
+        <div class="timeline">
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#3b82f6;"></div>
+            <div class="tl-content">
+              <div class="tl-title">AgentRuntime</div>
+              <div class="tl-desc">Classifies intent, routes to correct build/chat/refine pipeline, manages multi-turn memory</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#8b5cf6;"></div>
+            <div class="tl-content">
+              <div class="tl-title">ProjectBuilder</div>
+              <div class="tl-desc">Blueprint-based scaffolding with 8+ project types, conversation-aware context injection</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#10b981;"></div>
+            <div class="tl-content">
+              <div class="tl-title">CodeExecutor</div>
+              <div class="tl-desc">Sandboxed Python/JS execution with subprocess isolation and 10s timeout</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#f59e0b;"></div>
+            <div class="tl-content">
+              <div class="tl-title">SSE Streaming</div>
+              <div class="tl-desc">Real-time event streaming — tool_start, text, tool_result, done events</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 5 — FEATURES
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="slide-header">
+      <div class="slide-tag">Features</div>
+      <div class="slide-title">What You Can Do</div>
+    </div>
+    <div class="grid-4">
+      <div class="card glow-blue">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa;">💬</div>
+        <div class="card-title">Natural Chat</div>
+        <div class="card-body">Conversational AI with full memory across the entire session. Ask questions or build projects.</div>
+      </div>
+      <div class="card glow-purple">
+        <div class="card-icon" style="background:rgba(139,92,246,0.12);color:#a78bfa;">🏗️</div>
+        <div class="card-title">Project Builder</div>
+        <div class="card-body">AI generates complete multi-file projects: React, Flask, Express, SaaS, APIs & more.</div>
+      </div>
+      <div class="card glow-green">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">👁️</div>
+        <div class="card-title">Live Preview</div>
+        <div class="card-body">Instant in-browser HTML preview, Monaco code editor, file tree, terminal emulation.</div>
+      </div>
+      <div class="card glow-amber">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;">🚀</div>
+        <div class="card-title">1-Click GitHub Push</div>
+        <div class="card-body">Publish entire workspace to a new GitHub repo instantly. Server-side token support.</div>
+      </div>
+      <div class="card glow-blue">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa;">📦</div>
+        <div class="card-title">Export as ZIP</div>
+        <div class="card-body">Download the full generated project structure with preserved folder layout.</div>
+      </div>
+      <div class="card glow-purple">
+        <div class="card-icon" style="background:rgba(139,92,246,0.12);color:#a78bfa;">🔐</div>
+        <div class="card-title">Auth System</div>
+        <div class="card-body">Full JWT login/signup, hashed passwords, per-user history and session persistence.</div>
+      </div>
+      <div class="card glow-green">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">📊</div>
+        <div class="card-title">Analytics</div>
+        <div class="card-body">7-day prompt chart, language breakdown, total projects — visualised in-app.</div>
+      </div>
+      <div class="card glow-amber">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;">🎨</div>
+        <div class="card-title">Dark / Light Mode</div>
+        <div class="card-body">Full theme system with CSS variables. Syntax highlighting adapts to the active theme.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 6 — AI AGENT DEEP DIVE
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="slide-header">
+      <div class="slide-tag">AI Engine</div>
+      <div class="slide-title">How the Agent Thinks</div>
+      <div class="slide-sub">A multi-step pipeline converts your words into a working workspace.</div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-main">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;">Intent → Action Pipeline</div>
+        <div class="timeline">
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#3b82f6; width:14px; height:14px; margin-top:2px;"></div>
+            <div class="tl-content">
+              <div class="tl-title">1. Intent Classification</div>
+              <div class="tl-desc">Conservative regex + contextual rules classify the prompt as: <em>chat</em>, <em>build</em>, or <em>refine</em>. Only explicit build verbs trigger project generation — avoiding accidental builds from casual questions.</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#8b5cf6; width:14px; height:14px; margin-top:2px;"></div>
+            <div class="tl-content">
+              <div class="tl-title">2. Blueprint Selection</div>
+              <div class="tl-desc">The LLM picks one of 8+ blueprints (react-app, flask-api, saas-dashboard, full-stack, etc.) based on the user's description.</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#10b981; width:14px; height:14px; margin-top:2px;"></div>
+            <div class="tl-content">
+              <div class="tl-title">3. Agentic Tool Loop</div>
+              <div class="tl-desc">AgentRuntime iterates: <strong>list_files → read_file → write_file → validate</strong> using the LLM to decide what to do next at each step. Up to 24 iterations per build.</div>
+            </div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-dot" style="background:#f59e0b; width:14px; height:14px; margin-top:2px;"></div>
+            <div class="tl-content">
+              <div class="tl-title">4. Conversation Memory</div>
+              <div class="tl-desc">Up to 40 prior messages are serialised and injected into every LLM call — so refinement requests remember your original design preferences.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feature-aside">
+        <div class="mini-card">
+          <div class="mini-card-label">Blueprints</div>
+          <div class="mini-card-value" style="color:#60a5fa;">8+</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">Project types supported</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-label">Agent iterations</div>
+          <div class="mini-card-value" style="color:#a78bfa;">24</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">Max tool steps per build</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-label">Chat memory</div>
+          <div class="mini-card-value" style="color:#34d399;">40</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">Messages kept in context</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-label">Rate limit</div>
+          <div class="mini-card-value" style="color:#fbbf24;">10/min</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">Sliding window per IP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 7 — SECURITY
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="slide-header">
+      <div class="slide-tag">Security</div>
+      <div class="slide-title">Built to Be Safe</div>
+      <div class="slide-sub">Security was designed in from day one — not added as an afterthought.</div>
+    </div>
+    <div class="grid-3">
+      <div class="card glow-blue">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa;">🔐</div>
+        <div class="card-title">JWT Authentication</div>
+        <div class="card-body">7-day expiring tokens, signed with a secret key. Every protected route validates the bearer token before responding.</div>
+        <div style="margin-top:0.8rem;"><span class="pill blue">PyJWT</span> <span class="pill blue">Bearer tokens</span></div>
+      </div>
+      <div class="card glow-amber">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;">🏖️</div>
+        <div class="card-title">Sandboxed Execution</div>
+        <div class="card-body">User-submitted code runs in an isolated subprocess with a hard 10-second timeout. stdout/stderr are captured cleanly.</div>
+        <div style="margin-top:0.8rem;"><span class="pill amber">subprocess</span> <span class="pill amber">10s timeout</span></div>
+      </div>
+      <div class="card glow-green">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">🛤️</div>
+        <div class="card-title">Path Traversal Guard</div>
+        <div class="card-body">All file operations validate that the resolved path starts with the workspace directory. No escape to the host filesystem.</div>
+        <div style="margin-top:0.8rem;"><span class="pill green">os.path.abspath</span> <span class="pill green">403 guard</span></div>
+      </div>
+      <div class="card glow-purple">
+        <div class="card-icon" style="background:rgba(139,92,246,0.12);color:#a78bfa;">🔒</div>
+        <div class="card-title">Password Hashing</div>
+        <div class="card-body">Passwords are hashed with Werkzeug's PBKDF2-SHA256 before storage. Plain text passwords never touch the database.</div>
+        <div style="margin-top:0.8rem;"><span class="pill purple">Werkzeug</span> <span class="pill purple">PBKDF2</span></div>
+      </div>
+      <div class="card glow-blue">
+        <div class="card-icon" style="background:rgba(239,68,68,0.12);color:#f87171;">🚦</div>
+        <div class="card-title">Rate Limiting</div>
+        <div class="card-body">Sliding-window rate limiter on the AI endpoint: max 10 requests per minute per IP. Blocks abuse without third-party middleware.</div>
+        <div style="margin-top:0.8rem;"><span class="pill rose">10 req/min</span> <span class="pill rose">per-IP</span></div>
+      </div>
+      <div class="card glow-green">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12);color:#34d399;">🌐</div>
+        <div class="card-title">CORS Policy</div>
+        <div class="card-body">Strict allowlist of origins (localhost:5173–5175 only). No wildcard `*` — requests from unknown origins are rejected.</div>
+        <div style="margin-top:0.8rem;"><span class="pill green">Flask-CORS</span> <span class="pill green">allowlist</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 8 — STATS
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="slide-header">
+      <div class="slide-tag">By the Numbers</div>
+      <div class="slide-title">Project Scale</div>
+    </div>
+    <div class="grid-4" style="margin-bottom:2.5rem;">
+      <div class="card stat-box">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Source Files</div>
+      </div>
+      <div class="card stat-box">
+        <div class="stat-num">8K+</div>
+        <div class="stat-label">Lines of Code</div>
+      </div>
+      <div class="card stat-box">
+        <div class="stat-num">15+</div>
+        <div class="stat-label">React Components</div>
+      </div>
+      <div class="card stat-box">
+        <div class="stat-num">18+</div>
+        <div class="stat-label">API Endpoints</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;">Tech Language Split</div>
+        <div>
+          <div class="prog-row">
+            <div class="prog-label"><span>Python (Backend)</span><span style="color:#60a5fa;">38%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:38%;background:linear-gradient(90deg,#3b82f6,#60a5fa);"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label"><span>JavaScript / JSX</span><span style="color:#a78bfa;">42%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:42%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label"><span>CSS</span><span style="color:#34d399;">12%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:12%;background:linear-gradient(90deg,#10b981,#34d399);"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label"><span>JSON / Configs / Docs</span><span style="color:#fbbf24;">8%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:8%;background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:1.5rem;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;">Development Highlights</div>
+        <div class="timeline">
+          <div class="tl-row"><div class="tl-dot" style="background:#3b82f6;"></div><div class="tl-content"><div class="tl-title">Full-Stack Architecture</div><div class="tl-desc">Decoupled backend API + frontend SPA with shared JWT auth layer</div></div></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#8b5cf6;"></div><div class="tl-content"><div class="tl-title">Streaming UX</div><div class="tl-desc">Server-Sent Events for real-time AI response streaming</div></div></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#10b981;"></div><div class="tl-content"><div class="tl-title">Agentic Tool Use</div><div class="tl-desc">Multi-step LLM agent loop with list/read/write file tools</div></div></div>
+          <div class="tl-row"><div class="tl-dot" style="background:#f59e0b;"></div><div class="tl-content"><div class="tl-title">GitHub Integration</div><div class="tl-desc">One-click publish to GitHub via REST API — no git CLI needed</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 9 — ROADMAP
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s9">
+    <div class="slide-header">
+      <div class="slide-tag">Roadmap</div>
+      <div class="slide-title">What's Coming Next</div>
+      <div class="slide-sub">Planned features to take Aizen from a strong project to a viral product.</div>
+    </div>
+    <div class="grid-3">
+      <div class="roadmap-col">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#60a5fa;margin-bottom:0.5rem;">Phase 1 — Core UX</div>
+        <div class="rm-item">
+          <div class="rm-icon">⚡</div>
+          <div><div class="rm-title">Token Streaming</div><div class="rm-desc">Show AI response word-by-word as it generates, like ChatGPT</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">🎤</div>
+          <div><div class="rm-title">Voice Input</div><div class="rm-desc">Speak your prompt via Web Speech API — zero backend changes</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">🗂️</div>
+          <div><div class="rm-title">Multi-Project Manager</div><div class="rm-desc">Save, switch, and revisit multiple projects in a sidebar</div></div>
+        </div>
+      </div>
+      <div class="roadmap-col">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#a78bfa;margin-bottom:0.5rem;">Phase 2 — Power</div>
+        <div class="rm-item">
+          <div class="rm-icon">🔗</div>
+          <div><div class="rm-title">Shareable Links</div><div class="rm-desc">Share any project via a public URL — viewers can fork it</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">▶️</div>
+          <div><div class="rm-title">Run Code in Chat</div><div class="rm-desc">Run button inside code blocks — output appears inline</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">/</div>
+          <div><div class="rm-title">Slash Commands</div><div class="rm-desc">Type / for a menu of prompt starters and quick actions</div></div>
+        </div>
+      </div>
+      <div class="roadmap-col">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#34d399;margin-bottom:0.5rem;">Phase 3 — Polish</div>
+        <div class="rm-item">
+          <div class="rm-icon">🖥️</div>
+          <div><div class="rm-title">Split-Screen Preview</div><div class="rm-desc">Side-by-side chat + live preview — like Bolt.new</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">🤖</div>
+          <div><div class="rm-title">Multi-Model Support</div><div class="rm-desc">Pick from Llama 70B, Mixtral, Gemma2 in settings</div></div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-icon">📱</div>
+          <div><div class="rm-title">Mobile Layout</div><div class="rm-desc">Fully responsive UI for phone and tablet usage</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SLIDE 10 — CONCLUSION / CTA
+  ════════════════════════════════════════════ -->
+  <div class="slide" id="s10" style="align-items:center;justify-content:center;text-align:center;">
+    <div class="cta-card">
+      <div class="hero-logo" style="margin-bottom:1.5rem;width:72px;height:72px;font-size:1.6rem;">AI</div>
+      <div style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;letter-spacing:-0.03em;background:linear-gradient(135deg,#fff,#9090c0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        Aizen — AI Coding Workspace
+      </div>
+      <div style="margin-top:1rem;font-size:1rem;color:var(--muted);max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;">
+        A full-stack, production-grade AI assistant that turns natural language into complete, deployable software — built from scratch with Flask, React, and Groq.
+      </div>
+      <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;">
+        <span class="pill blue">Full-Stack</span>
+        <span class="pill purple">Agentic AI</span>
+        <span class="pill green">Real-time Streaming</span>
+        <span class="pill amber">GitHub Integration</span>
+        <span class="pill rose">JWT Auth</span>
+      </div>
+      <div class="divider" style="max-width:400px;margin:1.8rem auto;"></div>
+      <div style="font-size:0.82rem;color:var(--muted);">
+        <strong style="color:var(--text);">Built with:</strong>
+        Python · Flask · React 18 · Vite · Groq API · SQLite · JWT · Tailwind CSS
+      </div>
+    </div>
+    <div style="margin-top:2rem;font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;">
+      Major Project · 2025–26 · Thank you
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── NAVIGATION ── -->
+<nav class="controls">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">←</button>
+  <div class="progress-dots" id="dots"></div>
+  <div class="slide-counter" id="counter">1 / 10</div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">→</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(index) {
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current].classList.remove('exit'), 500);
+
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add('active');
+
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    counterEl.textContent = `${current + 1} / ${slides.length}`;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+  });
+
+  // Touch swipe
+  let startX = 0;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) changeSlide(dx < 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
